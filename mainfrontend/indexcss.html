@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dikshita's Digital Edition</title>
+  <link rel="stylesheet" href="stylecss.css"/>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+  <div class="hero">
+    <h1>DIKSHITA'S DIGITAL EDITION</h1>
+  </div>
+
+  <!-- Custom Sign-In Button -->
+  <button class="signin-btn" id="googleSignIn">Sign In with Google</button>
+
+  <!-- Scroll Section -->
+  <div class="scroll-section">
+    <h1>Frequently Asked Questions</h1>
+    <p>Here are some of the most common queries</p>
+
+    <div class="faq-container">
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>What is Dikshita Digital Edition?</span>
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+          Dikshita Digital Edition is an AI-powered avatar that preserves Dikshita’s voice, emotions, and memories.
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>How do I interact with this platform?</span>
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+          You can talk to Dikshita’s avatar — just like a real conversation.
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>Why did you create this platform?</span>
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+          To solve the pain of fading memories — so Dikshita’s voice and essence remain.
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>In what other forms can I interact?</span>
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+          Web app today. Coming soon: mobile apps, holograms, and offline assistants.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Google Identity Initialization -->
+  <div id="g_id_onload"
+    data-client_id="66725646584-c3nk5kh7u6csdcb3ie62t616num7dv7h.apps.googleusercontent.com"
+    data-context="signin"
+    data-ux_mode="popup"
+    data-callback="handleCredentialResponse"
+    data-auto_prompt="false">
+  </div>
+
+  <script>
+    // FAQ toggle logic
+    document.querySelectorAll('.faq-question').forEach((question) => {
+      question.addEventListener('click', () => {
+        const answer = question.nextElementSibling;
+        const toggle = question.querySelector('.faq-toggle');
+        const isOpen = answer.style.display === 'block';
+
+        document.querySelectorAll('.faq-answer').forEach((a) => (a.style.display = 'none'));
+        document.querySelectorAll('.faq-toggle').forEach((t) => (t.textContent = '+'));
+
+        if (!isOpen) {
+          answer.style.display = 'block';
+          toggle.textContent = '−';
+        }
+      });
+    });
+
+  let tokenClient;
+
+  window.onload = function () {
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: '66725646584-c3nk5kh7u6csdcb3ie62t616num7dv7h.apps.googleusercontent.com',
+      scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
+      callback: async (response) => {
+        if (response.error) {
+          alert("Login failed");
+          console.error(response);
+          return;
+        }
+
+        // Fetch user info from Google APIs using the access token
+        const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: {
+            Authorization: `Bearer ${response.access_token}`
+          }
+        });
+
+        const user = await res.json();
+        alert(`Welcome, ${user.name}!`);
+        console.log(user); // You get name, email, picture, etc.
+
+        // Optionally show user data on screen
+        const welcomeBox = document.createElement('div');
+        welcomeBox.innerHTML = `<h2>Hello, ${user.name}</h2><img src="${user.picture}" width="50" />`;
+        document.body.appendChild(welcomeBox);
+        window.location.href = "http://127.0.0.1:5501/index4.html";
+
+      }
+    });
+
+    document.getElementById("googleSignIn").addEventListener("click", () => {
+      tokenClient.requestAccessToken();
+    });
+  };
+</script>
